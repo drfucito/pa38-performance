@@ -1,47 +1,44 @@
-// service-worker.js — auto-update, network-first
-
-const CACHE_NAME = "pa38-cache-v1";
-
-// Files to pre-cache (optional)
-const PRECACHE = [
-  "./",
-  "./index.html",
-  "./app.js",
-  "./manifest.webmanifest"
+const CACHE_NAME = "told-cache-v1";
+const PRECACHE_URLS = [
+  "/",
+  "/index.html",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/apple-touch-icon.png"
 ];
 
-// Install — cache core files
 self.addEventListener("install", (event) => {
-  self.skipWaiting(); // Activate immediately
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
   );
 });
 
-// Activate — delete old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     )
   );
-  self.clients.claim(); // Take control immediately
+  self.clients.claim();
 });
 
-// Fetch — NETWORK FIRST, cache fallback
 self.addEventListener("fetch", (event) => {
+  // Serve from cache first, fallback to network
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Save fresh version to cache
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        return response;
-      })
-      .catch(() => caches.match(event.request)) // Offline fallback
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((resp) => {
+        // Optionally cache GET requests for same-origin HTML/CSS/JS
+        if (event.request.method === "GET" && resp && resp.status === 200 && resp.type !== "opaque") {
+          const respClone = resp.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, respClone));
+        }
+        return resp;
+      }).catch(() => {
+        // Fallback to root for navigation requests when offline
+        if (event.request.mode === "navigate") return caches.match("/");
+      });
+    })
   );
 });
