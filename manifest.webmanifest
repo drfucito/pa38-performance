@@ -1,0 +1,21 @@
+{
+  "name": "PA-38-112 Performance",
+  "short_name": "PA-38 Perf",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#050913",
+  "theme_color": "#0b1724",
+  "description": "Training-only PA-38-112 Tomahawk performance helper with favorites and live METAR.",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

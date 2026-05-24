@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PA-38 Performance</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- App theme colors -->
+  <meta name="theme-color" content="#0b1724" />
+
+  <!-- iOS support -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #050913;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
+    }
+    p {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>PA‑38‑112 Performance</h1>
+  <p>Your PWA is installed and running.</p>
+
+  <script>
+    // Register service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .catch(err => console.error("SW registration failed:", err));
+    }
+  </script>
+</body>
+</html>
