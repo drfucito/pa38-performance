@@ -167,57 +167,26 @@
   <main>
     <section class="card">
       <nav class="tabs" aria-label="PA-38 performance sections">
-        <button
-          class="tab-button active"
-          type="button"
-          data-tab-target="tab-aircraft"
-        >
-          Aircraft
-        </button>
-        <button
-          class="tab-button"
-          type="button"
-          data-tab-target="tab-airport"
-        >
-          Airport
-        </button>
-        <button
-          class="tab-button"
-          type="button"
-          data-tab-target="tab-weather"
-        >
-          Weather
-        </button>
-        <button
-          class="tab-button"
-          type="button"
-          data-tab-target="tab-performance"
-        >
-          Performance
-        </button>
-        <button
-          class="tab-button"
-          type="button"
-          data-tab-target="tab-favorites"
-        >
-          Favorites
-        </button>
+        <button class="tab-button active" type="button" data-tab-target="tab-aircraft">Aircraft</button>
+        <button class="tab-button" type="button" data-tab-target="tab-airport">Airport</button>
+        <button class="tab-button" type="button" data-tab-target="tab-weather">Weather</button>
+        <button class="tab-button" type="button" data-tab-target="tab-performance">Performance</button>
+        <button class="tab-button" type="button" data-tab-target="tab-favorites">Favorites</button>
       </nav>
     </section>
 
-    <section class="card" id="tab-aircraft" data-tab-panel>
+    <section class="card tab-panel active" id="tab-aircraft" data-tab-panel>
       <div class="panel-title">Aircraft</div>
       <div class="panel-description">
         In later phases, this tab will manage PA‑38 profiles, empty weight,
         fuel, and weight &amp; balance presets.
       </div>
       <div class="placeholder">
-        Phase 1 placeholder: aircraft profile editor and W&amp;B will appear
-        here.
+        Phase 1 placeholder: aircraft profile editor and W&amp;B will appear here.
       </div>
     </section>
 
-    <section class="card" id="tab-airport" data-tab-panel>
+    <section class="card tab-panel" id="tab-airport" data-tab-panel>
       <div class="panel-title">Airport</div>
       <div class="panel-description">
         This tab will hold airport presets, runway length, slope, and surface
@@ -228,7 +197,7 @@
       </div>
     </section>
 
-    <section class="card" id="tab-weather" data-tab-panel>
+    <section class="card tab-panel" id="tab-weather" data-tab-panel>
       <div class="panel-title">Weather</div>
       <div class="panel-description">
         This tab will combine auto METAR lookup with manual override, including
@@ -240,7 +209,7 @@
       </div>
     </section>
 
-    <section class="card" id="tab-performance" data-tab-panel>
+    <section class="card tab-panel" id="tab-performance" data-tab-panel>
       <div class="panel-title">Performance</div>
       <div class="panel-description">
         This is where takeoff, landing, and crosswind performance will be
@@ -252,7 +221,7 @@
       </div>
     </section>
 
-    <section class="card" id="tab-favorites" data-tab-panel>
+    <section class="card tab-panel" id="tab-favorites" data-tab-panel>
       <div class="panel-title">Favorites</div>
       <div class="panel-description">
         Saved aircraft and airport presets will live here for quick recall
