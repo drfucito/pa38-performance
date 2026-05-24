@@ -7,6 +7,14 @@
 
 <!-- Inline SVG favicon (red square with TOLD) -->
 <link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="100%" height="100%" rx="24" fill="%23c62828"/><text x="50%" y="55%" font-family="Arial, Helvetica, sans-serif" font-size="72" fill="white" font-weight="700" text-anchor="middle" alignment-baseline="middle">TOLD</text></svg>'>
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<meta name="theme-color" content="#c62828" />
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js').catch(()=>{/*sw reg failed*/});
+  }
+</script>
 
 <style>
   :root{
