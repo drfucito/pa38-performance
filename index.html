@@ -223,16 +223,26 @@ function densityAltitude(elevFt,tempF,altimInHg){
   return Math.round(pressureAltitude + 120 * (tempC - isaTemp));
 }
 
-function windComponents(rwy,windDir,windKts){
-  rwy = (rwy % 360 + 360) % 360;
-  windDir = (windDir % 360 + 360) % 360;
-  let angle = windDir - rwy;
-  if(angle > 180) angle -= 360;
-  if(angle < -180) angle += 360;
-  const rad = Math.abs(angle) * Math.PI/180;
-  const head = Math.round(Math.cos(rad) * windKts);
-  const cross = Math.round(Math.sin(rad) * windKts);
-  return { headwind: Math.abs(angle)>90 ? -head : head, crosswind: cross };
+function windComponents(rwyHeadingDeg, windDirDeg, windKts) {
+  const rwy = (rwyHeadingDeg % 360 + 360) % 360;
+  const wind = (windDirDeg % 360 + 360) % 360;
+
+  let angle = wind - rwy;
+  if (angle > 180) angle -= 360;
+  if (angle < -180) angle += 360;
+
+  const angRad = Math.abs(angle) * Math.PI / 180;
+
+  // ✅ Use windKts here, not windDirDeg
+  const head = Math.round(Math.cos(angRad) * windKts);
+  const cross = Math.round(Math.sin(angRad) * windKts);
+
+  const headSigned = Math.abs(angle) > 90 ? -head : head;
+
+  return {
+    headwind: headSigned,
+    crosswind: cross
+  };
 }
 
 function weightCorrectionFactor(weight, ref=1700){
