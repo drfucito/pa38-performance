@@ -1,16 +1,11 @@
 {
   "name": "TOLD — PA-38-112",
   "short_name": "TOLD",
-  "description": "Simple PA-38-112 takeoff & landing estimator (US units)",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/pa38-performance/",
+  "scope": "/pa38-performance/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#071028",
   "theme_color": "#c62828",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
-  ]
-}
+    { "src": "/pa38-performance/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/pa38-performance/icon-
