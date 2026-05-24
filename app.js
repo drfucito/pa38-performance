@@ -38,7 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Fetch METAR
 async function fetchMetar(icao) {
-  const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=${icao}&data=metar&tz=UTC&format=json&latlon=no&year1=2024&month1=1&day1=1`;
+  // Build today's date in YYYY-MM-DD
+  const today = new Date();
+  const yyyy = today.getUTCFullYear();
+  const mm = String(today.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(today.getUTCDate()).padStart(2, "0");
+
+  const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=${icao}&data=metar&tz=UTC&format=json&latlon=no&year1=${yyyy}&month1=${mm}&day1=${dd}&year2=${yyyy}&month2=${mm}&day2=${dd}`;
 
   try {
     const response = await fetch(url);
