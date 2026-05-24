@@ -219,19 +219,25 @@
   </div>
 
   <div class="panel-subtitle" style="margin-top: 1rem;">Manual Weather Entry</div>
-  <div class="placeholder">
-    <label>Temperature (°C):</label>
-    <input id="tempInput" type="number" />
+<div class="placeholder">
+  <label>Unit system:</label>
+  <select id="unitSystem">
+    <option value="US">US (°F, inHg)</option>
+    <option value="EU">European (°C, mmHg)</option>
+  </select>
 
-    <label>Altimeter (inHg):</label>
-    <input id="altimeterInput" type="number" step="0.01" />
+  <label>Temperature:</label>
+  <input id="tempInput" type="number" />
 
-    <label>Wind Direction (°):</label>
-    <input id="windDirInput" type="number" />
+  <label>Altimeter:</label>
+  <input id="altimeterInput" type="number" step="0.01" />
 
-    <label>Wind Speed (kt):</label>
-    <input id="windSpeedInput" type="number" />
-  </div>
+  <label>Wind Direction (°):</label>
+  <input id="windDirInput" type="number" />
+
+  <label>Wind Speed (kt):</label>
+  <input id="windSpeedInput" type="number" />
+</div>
 
   <div class="panel-subtitle" style="margin-top: 1rem;">Density Altitude</div>
   <div class="placeholder">
