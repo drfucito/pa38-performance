@@ -6,6 +6,9 @@
   "display": "standalone",
   "background_color": "#071028",
   "theme_color": "#c62828",
-  "icons": [
-    { "src": "/pa38-performance/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/pa38-performance/icon-
+ "icons": [
+  { "src": "/pa38-performance/icon-192.png", "sizes": "192x192", "type": "image/png" },
+  { "src": "/pa38-performance/icon-512.png", "sizes": "512x512", "type": "image/png" },
+  { "src": "/pa38-performance/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+]
+}
