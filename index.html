@@ -266,11 +266,19 @@ function updateWeightSummaryUI(){
     <strong>Total takeoff weight:</strong> ${total} lb<br>
   `;
 
-  html += total > MTOW
-    ? `<div class="warning"><strong>WARNING:</strong> Exceeds MTOW ${MTOW} lb.</div>`
-    : `<div class="ok">Within MTOW (${MTOW} lb)</div>`;
-
-  document.getElementById('weightSummary').innerHTML = html;
+  if (total > MTOW) {
+  const diff = total - MTOW;
+  if (diff <= 50) {
+    html += `<div style="background:#3a2f0b;color:#fff3cd;padding:8px;border-radius:6px;margin-top:8px">
+               <strong>CAUTION:</strong> Over MTOW by ${diff} lb (within 50 lb limit).
+             </div>`;
+  } else {
+    html += `<div style="background:#3a0b0b;color:#ffdede;padding:8px;border-radius:6px;margin-top:8px">
+               <strong>WARNING:</strong> Exceeds MTOW by ${diff} lb.
+             </div>`;
+  }
+} else {
+  html += `<div class="ok">Within MTOW (${MTOW} lb)</div>`;
 }
 
 document.getElementById('saveBasicBtn').addEventListener('click',()=>{
