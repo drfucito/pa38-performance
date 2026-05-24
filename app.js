@@ -30,4 +30,89 @@ document.addEventListener("DOMContentLoaded", () => {
       .register("./service-worker.js")
       .catch((err) => console.error("SW registration failed:", err));
   }
+});   // ← END OF PHASE 1
+
+// -----------------------------
+// PHASE 2: WEATHER ENGINE
+// -----------------------------
+
+// Fetch METAR from NOAA Aviation Weather API
+async function fetchMetar(icao) {
+  const url = `https://aviationweather.gov/api/data/metar?ids=${icao}&format=json`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data || data.length === 0) {
+      return { error: "No METAR found for this airport." };
+    }
+
+    const metar = data[0];
+
+    return {
+      raw: metar.rawOb,
+      temp: metar.temp,
+      dewpoint: metar.dewp,
+      altimeter: metar.altim,
+      windDir: metar.wdir,
+      windSpeed: metar.wspd,
+      time: metar.obsTime
+    };
+  } catch (err) {
+    return { error: "Error fetching METAR." };
+  }
+}
+
+// Handle METAR button click
+document.getElementById("fetchMetarBtn").addEventListener("click", async () => {
+  const icao = document.getElementById("icaoInput").value.trim().toUpperCase();
+  const resultBox = document.getElementById("metarResult");
+
+  if (!icao) {
+    resultBox.textContent = "Please enter an ICAO code.";
+    return;
+  }
+
+  resultBox.textContent = "Fetching METAR...";
+
+  const metar = await fetchMetar(icao);
+
+  if (metar.error) {
+    resultBox.textContent = metar.error;
+    return;
+  }
+
+  resultBox.innerHTML = `
+    <strong>Raw METAR:</strong> ${metar.raw}<br>
+    <strong>Temp:</strong> ${metar.temp} °C<br>
+    <strong>Dewpoint:</strong> ${metar.dewpoint} °C<br>
+    <strong>Altimeter:</strong> ${metar.altimeter} inHg<br>
+    <strong>Wind:</strong> ${metar.windDir}° @ ${metar.windSpeed} kt<br>
+    <strong>Time:</strong> ${metar.time}
+  `;
+});
+
+// Density altitude calculation
+document.getElementById("calcDaBtn").addEventListener("click", () => {
+  const temp = parseFloat(document.getElementById("tempInput").value);
+  const altimeter = parseFloat(document.getElementById("altimeterInput").value);
+
+  const daBox = document.getElementById("daResult");
+
+  if (isNaN(temp) || isNaN(altimeter)) {
+    daBox.textContent = "Enter temperature and altimeter first.";
+    return;
+  }
+
+  // Pressure altitude formula
+  const pressureAltitude = (29.92 - altimeter) * 1000;
+
+  // ISA temperature at sea level = 15°C
+  const isaTemp = 15;
+
+  // Density altitude formula
+  const densityAltitude = pressureAltitude + 120 * (temp - isaTemp);
+
+  daBox.textContent = `Density Altitude: ${Math.round(densityAltitude)} ft`;
 });
