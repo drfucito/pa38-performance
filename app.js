@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // PHASE 2: WEATHER ENGINE
 // -----------------------------
 
-// Fetch METAR from NOAA Aviation Weather API
+// Fetch METAR
 async function fetchMetar(icao) {
   const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=${icao}&data=metar&tz=UTC&format=json&latlon=no&year1=2024&month1=1&day1=1`;
 
