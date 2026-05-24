@@ -280,7 +280,8 @@ function updateWeightSummaryUI(){
 } else {
   html += `<div class="ok">Within MTOW (${MTOW} lb)</div>`;
 }
-
+ document.getElementById('weightSummary').innerHTML = html;
+}
 document.getElementById('saveBasicBtn').addEventListener('click',()=>{
   const val = parseFloat(document.getElementById('basicWeight').value);
   if(isNaN(val) || val<=0){ alert("Enter valid basic weight"); return; }
