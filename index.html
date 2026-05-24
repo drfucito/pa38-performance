@@ -1,283 +1,311 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PA-38 Performance</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TOLD — PA-38-112 Simple Calculator</title>
 
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#0b1724" />
+<!-- Inline SVG favicon (red square with TOLD) -->
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="100%" height="100%" rx="24" fill="%23c62828"/><text x="50%" y="55%" font-family="Arial, Helvetica, sans-serif" font-size="72" fill="white" font-weight="700" text-anchor="middle" alignment-baseline="middle">TOLD</text></svg>'>
 
-  <style>
-    :root {
-      --bg: #050913;
-      --bg-elevated: #0b1724;
-      --accent: #3ea6ff;
-      --accent-soft: rgba(62, 166, 255, 0.15);
-      --text: #f5f7fb;
-      --muted: #9aa4b5;
-      --border: #1a2636;
-      --danger: #ff6b6b;
-      --radius: 10px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background: radial-gradient(circle at top, #101b33 0, #050913 55%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      padding: 1rem 1.25rem 0.5rem;
-    }
-
-    .app-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .app-subtitle {
-      font-size: 0.9rem;
-      color: var(--accent);
-      opacity: 0.9;
-    }
-
-    main {
-      flex: 1;
-      padding: 0 1.25rem 1.25rem;
-      max-width: 960px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .card {
-      background: linear-gradient(145deg, #050913, #0b1724);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
-      padding: 0.9rem 1rem;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 0.4rem;
-      overflow-x: auto;
-      padding-bottom: 0.25rem;
-    }
-
-    .tab-button {
-      flex: 1;
-      min-width: 0;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(5, 9, 19, 0.9);
-      color: var(--muted);
-      font-size: 0.8rem;
-      padding: 0.45rem 0.6rem;
-      text-align: center;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s ease, color 0.15s ease,
-        border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .tab-button.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(62, 166, 255, 0.4);
-    }
-
-    .tab-panel {
-      display: none;
-      margin-top: 0.4rem;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
-    .panel-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 0.35rem;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .panel-description {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 0.6rem;
-    }
-
-    .placeholder {
-      font-size: 0.85rem;
-      color: var(--muted);
-      padding: 0.6rem 0.75rem;
-      border-radius: var(--radius);
-      border: 1px dashed var(--border);
-      background: rgba(5, 9, 19, 0.7);
-    }
-
-    footer {
-      padding: 0.5rem 1.25rem 1rem;
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-align: center;
-      opacity: 0.8;
-    }
-
-    @media (min-width: 768px) {
-      .tabs {
-        gap: 0.5rem;
-      }
-
-      .tab-button {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.8rem;
-      }
-    }
-  </style>
+<style>
+  :root{
+    --bg:#071028; --card:#071827; --muted:#9aa4b5; --accent:#3ea6ff; --text:#f5f7fb;
+    --danger:#ff6b6b; --ok:#8ef08e;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#041026 0,#071028 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  .wrap{max-width:880px;margin:24px auto;padding:18px}
+  header{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:10px;background:#c62828;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+  h1{margin:0;font-size:1.1rem;color:var(--muted)}
+  .card{background:linear-gradient(145deg,#071827,#06121b);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 10px 30px rgba(0,0,0,0.6);margin-top:12px}
+  label{display:block;color:var(--muted);font-size:0.85rem;margin-top:10px}
+  input,select{width:100%;padding:8px;border-radius:8px;border:1px solid #123;background:transparent;color:var(--text);margin-top:6px}
+  .row{display:flex;gap:10px}
+  .col{flex:1}
+  button{margin-top:12px;padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#042033;font-weight:700;cursor:pointer}
+  .result{margin-top:12px;padding:12px;border-radius:8px;background:rgba(10,20,30,0.6);border:1px solid rgba(255,255,255,0.02)}
+  .muted{color:var(--muted);font-size:0.9rem}
+  .warning{background:#3a0b0b;color:#ffdede;padding:8px;border-radius:6px;margin-top:8px}
+  .ok{background:#083a12;color:#cfeff0;padding:8px;border-radius:6px;margin-top:8px}
+  small{color:var(--muted)}
+  footer{margin-top:14px;color:var(--muted);font-size:0.85rem;text-align:center}
+  @media(min-width:720px){ .row .col input{min-width:0} }
+</style>
 </head>
 <body>
-  <header>
-    <div class="app-title">PA-38-112 Performance</div>
-    <div class="app-subtitle">
-      Training-only Tomahawk performance helper · Phase 1 UI shell
+  <div class="wrap">
+    <header>
+      <div class="logo">TOLD</div>
+      <div>
+        <h1>PA‑38‑112 TOLD Calculator</h1>
+        <div class="muted">Simple US‑units takeoff & landing estimator — focused, offline, and easy</div>
+      </div>
+    </header>
+
+    <div class="card" id="appCard">
+      <section>
+        <div class="muted"><small>Weather & runway</small></div>
+
+        <div class="row">
+          <div class="col">
+            <label>Airport Elevation (ft)</label>
+            <input id="elev" type="number" value="100" />
+          </div>
+          <div class="col">
+            <label>Temperature (°F)</label>
+            <input id="tempF" type="number" value="59" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Altimeter (inHg)</label>
+            <input id="altim" type="number" step="0.01" value="29.92" />
+          </div>
+          <div class="col">
+            <label>Runway Heading (°)</label>
+            <input id="rwyHeading" type="number" value="09" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Wind Direction (°)</label>
+            <input id="windDir" type="number" value="090" />
+          </div>
+          <div class="col">
+            <label>Wind Speed (kt)</label>
+            <input id="windSpd" type="number" value="10" />
+          </div>
+        </div>
+      </section>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0">
+
+      <section>
+        <div class="muted"><small>Weights & fuel</small></div>
+
+        <label>Basic Empty Weight (lbs) — saved locally</label>
+        <input id="basicWeight" type="number" placeholder="e.g., 1100" />
+
+        <div class="row">
+          <div class="col">
+            <label>100LL Fuel (US gallons)</label>
+            <input id="fuelGal" type="number" step="0.1" value="20" />
+          </div>
+          <div class="col">
+            <label>Passengers (combined lbs)</label>
+            <input id="paxWeight" type="number" value="400" />
+          </div>
+        </div>
+
+        <label>Luggage (combined lbs)</label>
+        <input id="luggageWeight" type="number" value="50" />
+
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="saveBasicBtn">Save Basic Weight</button>
+          <button id="resetBasicBtn" style="background:#ff6b6b;color:#fff">Reset Saved</button>
+        </div>
+
+        <div id="weightSummary" class="result" aria-live="polite">
+          Total takeoff weight will appear here after inputs update.
+        </div>
+      </section>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0">
+
+      <section>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="calcBtn">Calculate Distances</button>
+          <div class="muted" style="margin-left:8px"><small>US units only</small></div>
+        </div>
+
+        <div id="out" class="result" aria-live="polite">
+          Enter inputs and click <strong>Calculate Distances</strong>.
+        </div>
+      </section>
     </div>
-  </header>
 
-  <main>
-    <section class="card">
-      <nav class="tabs" aria-label="PA-38 performance sections">
-        <button class="tab-button active" type="button" data-tab-target="tab-aircraft">Aircraft</button>
-        <button class="tab-button" type="button" data-tab-target="tab-airport">Airport</button>
-        <button class="tab-button" type="button" data-tab-target="tab-weather">Weather</button>
-        <button class="tab-button" type="button" data-tab-target="tab-performance">Performance</button>
-        <button class="tab-button" type="button" data-tab-target="tab-favorites">Favorites</button>
-      </nav>
-    </section>
-
-    <section class="card tab-panel active" id="tab-aircraft" data-tab-panel>
-      <div class="panel-title">Aircraft</div>
-      <div class="panel-description">
-        In later phases, this tab will manage PA‑38 profiles, empty weight,
-        fuel, and weight &amp; balance presets.
-      </div>
-      <div class="placeholder">
-        Phase 1 placeholder: aircraft profile editor and W&amp;B will appear here.
-      </div>
-    </section>
-
-    <section class="card tab-panel" id="tab-airport" data-tab-panel>
-      <div class="panel-title">Airport</div>
-      <div class="panel-description">
-        This tab will hold airport presets, runway length, slope, and surface
-        type for performance calculations.
-      </div>
-      <div class="placeholder">
-        Phase 1 placeholder: airport/runway configuration will appear here.
-      </div>
-    </section>
-
-   <section class="card tab-panel" id="tab-weather" data-tab-panel>
-  <div class="panel-title">Weather</div>
-  <div class="panel-description">
-    This tab will combine auto METAR lookup with manual override, including
-    temperature, altimeter, wind, and density altitude.
+    <footer>
+      <small>PA‑38‑112 TOLD — simple estimator. Replace sample tables in script with official digitized chart data for exact numbers.</small>
+    </footer>
   </div>
 
-  <div class="panel-subtitle">METAR Lookup</div>
-  <div class="placeholder">
-    <label>ICAO Airport Code:</label>
-    <input id="icaoInput" type="text" placeholder="e.g., KSBY" />
+<script>
+// -----------------------------
+// TOLD — Simple PA-38-112 estimator (US units)
+// -----------------------------
+const MTOW = 1670;
+const BASIC_WEIGHT_KEY = "pa38_basic_weight_v1";
+const FUEL_LB_PER_GAL = 6;
 
-    <button id="fetchMetarBtn" class="tab-button" style="margin-top: 0.5rem;">
-      Fetch METAR
-    </button>
+// Sample digitized tables (replace with your digitized Piper chart points)
+const TAKEOFF_TABLE = [
+  { key: 0, groundRoll: 600, distance50: 1400 },
+  { key: 2000, groundRoll: 700, distance50: 1600 },
+  { key: 4000, groundRoll: 850, distance50: 1850 },
+  { key: 6000, groundRoll: 1050, distance50: 2150 }
+];
+const LANDING_TABLE = [
+  { key: 0, groundRoll: 350, distance50: 900 },
+  { key: 2000, groundRoll: 420, distance50: 1050 },
+  { key: 4000, groundRoll: 520, distance50: 1250 },
+  { key: 6000, groundRoll: 650, distance50: 1500 }
+];
 
-    <div id="metarResult" style="margin-top: 0.75rem; color: var(--muted);">
-      No METAR fetched yet.
-    </div>
-  </div>
+// Helpers
+function loadBasicWeight(){ const raw = localStorage.getItem(BASIC_WEIGHT_KEY); if(!raw) return null; const n=parseFloat(raw); return isNaN(n)?null:n; }
+function saveBasicWeight(val){ if(val==null||isNaN(val)) return; localStorage.setItem(BASIC_WEIGHT_KEY,String(val)); }
+function resetBasicWeight(){ localStorage.removeItem(BASIC_WEIGHT_KEY); }
 
-  <div class="panel-subtitle" style="margin-top: 1rem;">Manual Weather Entry</div>
-<div class="placeholder">
-  <label>Unit system:</label>
-  <select id="unitSystem">
-    <option value="US">US (°F, inHg)</option>
-    <option value="EU">European (°C, mmHg)</option>
-  </select>
+function interpTable(table,key){
+  if(!table||table.length===0) return null;
+  table = table.slice().sort((a,b)=>a.key-b.key);
+  if(key <= table[0].key) return { groundRoll: table[0].groundRoll, distance50: table[0].distance50 };
+  if(key >= table[table.length-1].key) return { groundRoll: table[table.length-1].groundRoll, distance50: table[table.length-1].distance50 };
+  for(let i=0;i<table.length-1;i++){
+    const a=table[i], b=table[i+1];
+    if(key>=a.key && key<=b.key){
+      const t=(key-a.key)/(b.key-a.key);
+      return { groundRoll: a.groundRoll + t*(b.groundRoll-a.groundRoll), distance50: a.distance50 + t*(b.distance50-a.distance50) };
+    }
+  }
+  return null;
+}
 
-  <label>Temperature:</label>
-  <input id="tempInput" type="number" />
+function densityAltitude(elevFt,tempF,altimInHg){
+  const pressureAltitude = elevFt + (29.92 - altimInHg) * 1000;
+  const tempC = (tempF - 32) * 5/9;
+  const isaTempAtAltitude = 15 - (pressureAltitude / 1000) * 2;
+  const densityAlt = pressureAltitude + (120 * (tempC - isaTempAtAltitude));
+  return Math.round(densityAlt);
+}
 
-  <label>Altimeter:</label>
-  <input id="altimeterInput" type="number" step="0.01" />
+function windComponents(rwyHeadingDeg, windDirDeg, windKts){
+  const rwy = (rwyHeadingDeg % 360 + 360) % 360;
+  const wind = (windDirDeg % 360 + 360) % 360;
+  let angle = wind - rwy;
+  if(angle > 180) angle -= 360;
+  if(angle < -180) angle += 360;
+  const angRad = Math.abs(angle) * Math.PI / 180;
+  const head = Math.round(Math.cos(angRad) * windKts);
+  const cross = Math.round(Math.sin(angRad) * windKts);
+  const headSigned = Math.abs(angle) > 90 ? -head : head;
+  return { headwind: headSigned, crosswind: cross };
+}
 
-  <label>Wind Direction (°):</label>
-  <input id="windDirInput" type="number" />
+function weightCorrectionFactor(weightLbs, referenceWeight=1700){
+  const diff = weightLbs - referenceWeight;
+  const steps = diff / 100;
+  return 1 + (0.05 * steps);
+}
 
-  <label>Wind Speed (kt):</label>
-  <input id="windSpeedInput" type="number" />
-</div>
+// UI wiring
+function updateWeightSummaryUI(){
+  const basic = parseFloat(document.getElementById('basicWeight').value) || 0;
+  const fuelGal = parseFloat(document.getElementById('fuelGal').value) || 0;
+  const pax = parseFloat(document.getElementById('paxWeight').value) || 0;
+  const luggage = parseFloat(document.getElementById('luggageWeight').value) || 0;
+  const fuelLb = Math.round(fuelGal * FUEL_LB_PER_GAL);
+  const total = Math.round(basic + fuelLb + pax + luggage);
+  const summary = document.getElementById('weightSummary');
+  const perfWeightInput = document.getElementById('perfWeight');
+  let html = `<strong>Basic empty:</strong> ${basic} lb<br>`;
+  html += `<strong>Fuel:</strong> ${fuelGal} gal × ${FUEL_LB_PER_GAL} lb/gal = ${fuelLb} lb<br>`;
+  html += `<strong>Passengers:</strong> ${pax} lb<br>`;
+  html += `<strong>Luggage:</strong> ${luggage} lb<br><br>`;
+  html += `<strong>Total takeoff weight:</strong> <strong>${total} lb</strong><br>`;
+  if(total > MTOW) html += `<div class="warning"><strong>WARNING:</strong> Total weight ${total} lb exceeds MTOW ${MTOW} lb.</div>`;
+  else html += `<div class="ok">Within MTOW (${MTOW} lb).</div>`;
+  summary.innerHTML = html;
+}
 
-  <div class="panel-subtitle" style="margin-top: 1rem;">Density Altitude</div>
-  <div class="placeholder">
-    <button id="calcDaBtn" class="tab-button">Calculate Density Altitude</button>
+// Save/load handlers
+document.getElementById('saveBasicBtn').addEventListener('click', () => {
+  const val = parseFloat(document.getElementById('basicWeight').value);
+  if(isNaN(val) || val <= 0){ alert('Enter a valid basic empty weight (lbs) before saving.'); return; }
+  saveBasicWeight(val);
+  updateWeightSummaryUI();
+  alert('Basic empty weight saved locally.');
+});
+document.getElementById('resetBasicBtn').addEventListener('click', () => {
+  if(!confirm('Reset saved basic weight?')) return;
+  resetBasicWeight();
+  document.getElementById('basicWeight').value = '';
+  updateWeightSummaryUI();
+});
 
-    <div id="daResult" style="margin-top: 0.75rem; color: var(--muted);">
-      Density altitude will appear here.
-    </div>
-  </div>
-</section>
+// Auto-update summary when inputs change
+['basicWeight','fuelGal','paxWeight','luggageWeight'].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.addEventListener('input', updateWeightSummaryUI);
+});
 
-    <section class="card tab-panel" id="tab-performance" data-tab-panel>
-      <div class="panel-title">Performance</div>
-      <div class="panel-description">
-        This is where takeoff, landing, and crosswind performance will be
-        computed from PA‑38‑112 tables and your inputs.
-      </div>
-      <div class="placeholder">
-        Phase 1 placeholder: performance results and calculators will appear
-        here.
-      </div>
-    </section>
+// Load saved basic weight on start
+(function initSavedBasicWeight(){
+  const saved = loadBasicWeight();
+  if(saved != null) document.getElementById('basicWeight').value = saved;
+  updateWeightSummaryUI();
+})();
 
-    <section class="card tab-panel" id="tab-favorites" data-tab-panel>
-      <div class="panel-title">Favorites</div>
-      <div class="panel-description">
-        Saved aircraft and airport presets will live here for quick recall
-        during training flights.
-      </div>
-      <div class="placeholder">
-        Phase 1 placeholder: favorites list and preset management will appear
-        here.
-      </div>
-    </section>
-  </main>
+// Calculation
+document.getElementById('calcBtn').addEventListener('click', () => {
+  const elev = parseFloat(document.getElementById('elev').value) || 0;
+  const tempF = parseFloat(document.getElementById('tempF').value);
+  const altim = parseFloat(document.getElementById('altim').value) || 29.92;
+  const rwy = parseFloat(document.getElementById('rwyHeading').value) || 0;
+  const windDir = parseFloat(document.getElementById('windDir').value) || 0;
+  const windSpd = parseFloat(document.getElementById('windSpd').value) || 0;
+  const perfWeight = parseFloat(document.getElementById('perfWeight')?.value) || (loadBasicWeight() || 1700);
 
-  <footer>
-    PA‑38‑112 training helper · Phase 1 UI shell · PWA ready
-  </footer>
+  const out = document.getElementById('out');
+  if(isNaN(tempF)){ out.innerHTML = '<strong>Enter a valid temperature (°F).</strong>'; return; }
 
-  <script src="app.js"></script>
+  const da = densityAltitude(elev, tempF, altim);
+  const wc = windComponents(rwy, windDir, windSpd);
+  const baseTO = interpTable(TAKEOFF_TABLE, da);
+  const baseLD = interpTable(LANDING_TABLE, da);
+  if(!baseTO || !baseLD){ out.innerHTML = `<strong>No table data available for DA=${da} ft. Paste digitized chart data into the script.</strong>`; return; }
+
+  function applyWindCorrection(distance, headwind){
+    if(headwind >= 0){ const reduction = Math.min(headwind,20) * 0.015; return distance * (1 - reduction); }
+    else { const tw = Math.abs(headwind); const increase = Math.min(tw,10) * 0.03; return distance * (1 + increase); }
+  }
+
+  const wFactor = weightCorrectionFactor(perfWeight);
+  const toGroundRoll = Math.round(applyWindCorrection(baseTO.groundRoll * wFactor, wc.headwind));
+  const to50 = Math.round(applyWindCorrection(baseTO.distance50 * wFactor, wc.headwind));
+  const ldGroundRoll = Math.round(applyWindCorrection(baseLD.groundRoll * wFactor, wc.headwind));
+  const ld50 = Math.round(applyWindCorrection(baseLD.distance50 * wFactor, wc.headwind));
+
+  const basic = parseFloat(document.getElementById('basicWeight').value) || 0;
+  const fuelGal = parseFloat(document.getElementById('fuelGal').value) || 0;
+  const pax = parseFloat(document.getElementById('paxWeight').value) || 0;
+  const luggage = parseFloat(document.getElementById('luggageWeight').value) || 0;
+  const fuelLb = Math.round(fuelGal * FUEL_LB_PER_GAL);
+  const totalTakeoffWeight = Math.round(basic + fuelLb + pax + luggage);
+
+  let weightWarningHtml = '';
+  if(totalTakeoffWeight > MTOW) weightWarningHtml = `<div class="warning"><strong>WARNING:</strong> Total weight ${totalTakeoffWeight} lb exceeds MTOW ${MTOW} lb.</div>`;
+
+  out.innerHTML = `
+    <strong>Density Altitude:</strong> ${da} ft<br>
+    <strong>Wind components:</strong> Headwind ${wc.headwind} kt; Crosswind ${wc.crosswind} kt<br><br>
+
+    <strong>Takeoff (estimated)</strong><br>
+    Ground roll: <strong>${toGroundRoll} ft</strong><br>
+    Distance to 50 ft: <strong>${to50} ft</strong><br><br>
+
+    <strong>Landing (estimated)</strong><br>
+    Ground roll: <strong>${ldGroundRoll} ft</strong><br>
+    Distance over 50 ft: <strong>${ld50} ft</strong><br><br>
+
+    <strong>Performance weight used:</strong> ${perfWeight} lb<br>
+    <strong>Total takeoff weight (basic+fuel+pax+luggage):</strong> ${totalTakeoffWeight} lb<br>
+    ${weightWarningHtml}
+    <div class="muted" style="margin-top:8px"><small>Replace sample tables with official digitized Piper PA‑38‑112 values for accurate performance.</small></div>
+  `;
+});
+</script>
 </body>
 </html>
