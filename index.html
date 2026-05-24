@@ -5,16 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>TOLD — PA-38-112 Simple Calculator</title>
 
-<!-- Inline SVG favicon (red square with TOLD) -->
-<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192"><rect width="100%" height="100%" rx="24" fill="%23c62828"/><text x="50%" y="55%" font-family="Arial, Helvetica, sans-serif" font-size="72" fill="white" font-weight="700" text-anchor="middle" alignment-baseline="middle">TOLD</text></svg>'>
-<link rel="manifest" href="/manifest.webmanifest" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<!-- Manifest for PWA -->
+<link rel="manifest" href="/pa38-performance/manifest.webmanifest" />
+
+<!-- iOS Home Screen Icon -->
+<link rel="apple-touch-icon" href="/pa38-performance/apple-touch-icon.png" />
+
+<!-- Theme color for Android/iOS -->
 <meta name="theme-color" content="#c62828" />
+
+<!-- Register service worker -->
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js').catch(()=>{/*sw reg failed*/});
+    navigator.serviceWorker.register('/pa38-performance/service-worker.js')
+      .catch(()=>{});
   }
 </script>
+
+<!-- Inline SVG favicon -->
+<link rel="icon" href='data:image/svg+xml;utf8,
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192">
+<rect width="100%" height="100%" rx="24" fill="%23c62828"/>
+<text x="50%" y="55%" font-family="Arial" font-size="72" fill="white" font-weight="700" text-anchor="middle">TOLD</text>
+</svg>'>
 
 <style>
   :root{
@@ -28,19 +41,32 @@
   h1{margin:0;font-size:1.1rem;color:var(--muted)}
   .card{background:linear-gradient(145deg,#071827,#06121b);border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,0.02);box-shadow:0 10px 30px rgba(0,0,0,0.6);margin-top:12px}
   label{display:block;color:var(--muted);font-size:0.85rem;margin-top:10px}
-  input,select{width:100%;padding:8px;border-radius:8px;border:1px solid #123;background:transparent;color:var(--text);margin-top:6px}
-  .row{display:flex;gap:10px}
-  .col{flex:1}
-  button{margin-top:12px;padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#042033;font-weight:700;cursor:pointer}
+  input,select{width:100%;padding:8px;border-radius:8px;border:1px solid #123;background:transparent;color:var(--text);margin-top:6px;font-size:16px}
   .result{margin-top:12px;padding:12px;border-radius:8px;background:rgba(10,20,30,0.6);border:1px solid rgba(255,255,255,0.02)}
   .muted{color:var(--muted);font-size:0.9rem}
   .warning{background:#3a0b0b;color:#ffdede;padding:8px;border-radius:6px;margin-top:8px}
   .ok{background:#083a12;color:#cfeff0;padding:8px;border-radius:6px;margin-top:8px}
   small{color:var(--muted)}
   footer{margin-top:14px;color:var(--muted);font-size:0.85rem;text-align:center}
-  @media(min-width:720px){ .row .col input{min-width:0} }
+
+  /* Responsive fix for overlapping inputs */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .col {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  @media (min-width: 600px) {
+    .col {
+      flex: 1 1 calc(50% - 10px);
+    }
+  }
 </style>
 </head>
+
 <body>
   <div class="wrap">
     <header>
@@ -91,10 +117,10 @@
 
       <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0">
 
-      <section>
+            <section>
         <div class="muted"><small>Weights & fuel</small></div>
 
-        <label>Basic Empty Weight (lbs)</label>
+        <label>Basic Empty Weight (lbs) — saved locally</label>
         <input id="basicWeight" type="number" placeholder="e.g., 1100" />
 
         <div class="row">
@@ -103,12 +129,12 @@
             <input id="fuelGal" type="number" step="0.1" value="20" />
           </div>
           <div class="col">
-            <label>Passengers (total lbs)</label>
-            <input id="paxWeight" type="number" value="400" />
+            <label>Passengers (combined lbs)</label>
+            <input id="paxWeight" type="number" value="300" />
           </div>
         </div>
 
-        <label>Luggage (total lbs)</label>
+        <label>Luggage (combined lbs)</label>
         <input id="luggageWeight" type="number" value="50" />
 
         <div style="display:flex;gap:8px;margin-top:10px">
@@ -124,10 +150,7 @@
       <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:12px 0">
 
       <section>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="calcBtn">Calculate Distances</button>
-          <div class="muted" style="margin-left:8px"><small>US units only</small></div>
-        </div>
+        <button id="calcBtn">Calculate Distances</button>
 
         <div id="out" class="result" aria-live="polite">
           Enter inputs and click <strong>Calculate Distances</strong>.
@@ -141,14 +164,15 @@
   </div>
 
 <script>
-// -----------------------------
-// TOLD — Simple PA-38-112 estimator (US units)
-// -----------------------------
+/* -----------------------------
+   TOLD — Simple PA-38-112 estimator (US units)
+------------------------------ */
+
 const MTOW = 1670;
 const BASIC_WEIGHT_KEY = "pa38_basic_weight_v1";
 const FUEL_LB_PER_GAL = 6;
 
-// Sample digitized tables (replace with your digitized Piper chart points)
+// Sample digitized tables (replace with real Piper data)
 const TAKEOFF_TABLE = [
   { key: 0, groundRoll: 600, distance50: 1400 },
   { key: 2000, groundRoll: 700, distance50: 1600 },
@@ -162,54 +186,60 @@ const LANDING_TABLE = [
   { key: 6000, groundRoll: 650, distance50: 1500 }
 ];
 
-// Helpers
-function loadBasicWeight(){ const raw = localStorage.getItem(BASIC_WEIGHT_KEY); if(!raw) return null; const n=parseFloat(raw); return isNaN(n)?null:n; }
-function saveBasicWeight(val){ if(val==null||isNaN(val)) return; localStorage.setItem(BASIC_WEIGHT_KEY,String(val)); }
-function resetBasicWeight(){ localStorage.removeItem(BASIC_WEIGHT_KEY); }
+function loadBasicWeight(){
+  const raw = localStorage.getItem(BASIC_WEIGHT_KEY);
+  if(!raw) return null;
+  const n = parseFloat(raw);
+  return isNaN(n) ? null : n;
+}
+function saveBasicWeight(val){
+  if(val == null || isNaN(val)) return;
+  localStorage.setItem(BASIC_WEIGHT_KEY, String(val));
+}
+function resetBasicWeight(){
+  localStorage.removeItem(BASIC_WEIGHT_KEY);
+}
 
 function interpTable(table,key){
-  if(!table||table.length===0) return null;
   table = table.slice().sort((a,b)=>a.key-b.key);
-  if(key <= table[0].key) return { groundRoll: table[0].groundRoll, distance50: table[0].distance50 };
-  if(key >= table[table.length-1].key) return { groundRoll: table[table.length-1].groundRoll, distance50: table[table.length-1].distance50 };
+  if(key <= table[0].key) return table[0];
+  if(key >= table[table.length-1].key) return table[table.length-1];
   for(let i=0;i<table.length-1;i++){
     const a=table[i], b=table[i+1];
     if(key>=a.key && key<=b.key){
       const t=(key-a.key)/(b.key-a.key);
-      return { groundRoll: a.groundRoll + t*(b.groundRoll-a.groundRoll), distance50: a.distance50 + t*(b.distance50-a.distance50) };
+      return {
+        groundRoll: a.groundRoll + t*(b.groundRoll-a.groundRoll),
+        distance50: a.distance50 + t*(b.distance50-a.distance50)
+      };
     }
   }
-  return null;
 }
 
 function densityAltitude(elevFt,tempF,altimInHg){
   const pressureAltitude = elevFt + (29.92 - altimInHg) * 1000;
   const tempC = (tempF - 32) * 5/9;
-  const isaTempAtAltitude = 15 - (pressureAltitude / 1000) * 2;
-  const densityAlt = pressureAltitude + (120 * (tempC - isaTempAtAltitude));
-  return Math.round(densityAlt);
+  const isaTemp = 15 - (pressureAltitude / 1000) * 2;
+  return Math.round(pressureAltitude + 120 * (tempC - isaTemp));
 }
 
-function windComponents(rwyHeadingDeg, windDirDeg, windKts){
-  const rwy = (rwyHeadingDeg % 360 + 360) % 360;
-  const wind = (windDirDeg % 360 + 360) % 360;
-  let angle = wind - rwy;
+function windComponents(rwy,windDir,windKts){
+  rwy = (rwy % 360 + 360) % 360;
+  windDir = (windDir % 360 + 360) % 360;
+  let angle = windDir - rwy;
   if(angle > 180) angle -= 360;
   if(angle < -180) angle += 360;
-  const angRad = Math.abs(angle) * Math.PI / 180;
-  const head = Math.round(Math.cos(angRad) * windKts);
-  const cross = Math.round(Math.sin(angRad) * windKts);
-  const headSigned = Math.abs(angle) > 90 ? -head : head;
-  return { headwind: headSigned, crosswind: cross };
+  const rad = Math.abs(angle) * Math.PI/180;
+  const head = Math.round(Math.cos(rad) * windKts);
+  const cross = Math.round(Math.sin(rad) * windKts);
+  return { headwind: Math.abs(angle)>90 ? -head : head, crosswind: cross };
 }
 
-function weightCorrectionFactor(weightLbs, referenceWeight=1700){
-  const diff = weightLbs - referenceWeight;
-  const steps = diff / 100;
-  return 1 + (0.05 * steps);
+function weightCorrectionFactor(weight, ref=1700){
+  const diff = weight - ref;
+  return 1 + (0.05 * (diff/100));
 }
 
-// UI wiring
 function updateWeightSummaryUI(){
   const basic = parseFloat(document.getElementById('basicWeight').value) || 0;
   const fuelGal = parseFloat(document.getElementById('fuelGal').value) || 0;
@@ -217,103 +247,94 @@ function updateWeightSummaryUI(){
   const luggage = parseFloat(document.getElementById('luggageWeight').value) || 0;
   const fuelLb = Math.round(fuelGal * FUEL_LB_PER_GAL);
   const total = Math.round(basic + fuelLb + pax + luggage);
-  const summary = document.getElementById('weightSummary');
-  const perfWeightInput = document.getElementById('perfWeight');
-  let html = `<strong>Basic empty:</strong> ${basic} lb<br>`;
-  html += `<strong>Fuel:</strong> ${fuelGal} gal × ${FUEL_LB_PER_GAL} lb/gal = ${fuelLb} lb<br>`;
-  html += `<strong>Passengers:</strong> ${pax} lb<br>`;
-  html += `<strong>Luggage:</strong> ${luggage} lb<br><br>`;
-  html += `<strong>Total takeoff weight:</strong> <strong>${total} lb</strong><br>`;
-  if(total > MTOW) html += `<div class="warning"><strong>WARNING:</strong> Total weight ${total} lb exceeds MTOW ${MTOW} lb.</div>`;
-  else html += `<div class="ok">Within MTOW (${MTOW} lb).</div>`;
-  summary.innerHTML = html;
+
+  let html = `
+    <strong>Basic empty:</strong> ${basic} lb<br>
+    <strong>Fuel:</strong> ${fuelGal} gal × ${FUEL_LB_PER_GAL} = ${fuelLb} lb<br>
+    <strong>Passengers:</strong> ${pax} lb<br>
+    <strong>Luggage:</strong> ${luggage} lb<br><br>
+    <strong>Total takeoff weight:</strong> ${total} lb<br>
+  `;
+
+  html += total > MTOW
+    ? `<div class="warning"><strong>WARNING:</strong> Exceeds MTOW ${MTOW} lb.</div>`
+    : `<div class="ok">Within MTOW (${MTOW} lb)</div>`;
+
+  document.getElementById('weightSummary').innerHTML = html;
 }
 
-// Save/load handlers
-document.getElementById('saveBasicBtn').addEventListener('click', () => {
+document.getElementById('saveBasicBtn').addEventListener('click',()=>{
   const val = parseFloat(document.getElementById('basicWeight').value);
-  if(isNaN(val) || val <= 0){ alert('Enter a valid basic empty weight (lbs) before saving.'); return; }
+  if(isNaN(val) || val<=0){ alert("Enter valid basic weight"); return; }
   saveBasicWeight(val);
   updateWeightSummaryUI();
-  alert('Basic empty weight saved locally.');
 });
-document.getElementById('resetBasicBtn').addEventListener('click', () => {
-  if(!confirm('Reset saved basic weight?')) return;
+document.getElementById('resetBasicBtn').addEventListener('click',()=>{
   resetBasicWeight();
-  document.getElementById('basicWeight').value = '';
+  document.getElementById('basicWeight').value="";
   updateWeightSummaryUI();
 });
 
-// Auto-update summary when inputs change
 ['basicWeight','fuelGal','paxWeight','luggageWeight'].forEach(id=>{
-  const el=document.getElementById(id); if(el) el.addEventListener('input', updateWeightSummaryUI);
+  document.getElementById(id).addEventListener('input', updateWeightSummaryUI);
 });
 
-// Load saved basic weight on start
-(function initSavedBasicWeight(){
+(function init(){
   const saved = loadBasicWeight();
-  if(saved != null) document.getElementById('basicWeight').value = saved;
+  if(saved!=null) document.getElementById('basicWeight').value = saved;
   updateWeightSummaryUI();
 })();
 
-// Calculation
-document.getElementById('calcBtn').addEventListener('click', () => {
-  const elev = parseFloat(document.getElementById('elev').value) || 0;
+document.getElementById('calcBtn').addEventListener('click',()=>{
+  const elev = parseFloat(document.getElementById('elev').value)||0;
   const tempF = parseFloat(document.getElementById('tempF').value);
-  const altim = parseFloat(document.getElementById('altim').value) || 29.92;
-  const rwy = parseFloat(document.getElementById('rwyHeading').value) || 0;
-  const windDir = parseFloat(document.getElementById('windDir').value) || 0;
-  const windSpd = parseFloat(document.getElementById('windSpd').value) || 0;
-  const perfWeight = parseFloat(document.getElementById('perfWeight')?.value) || (loadBasicWeight() || 1700);
+  const altim = parseFloat(document.getElementById('altim').value)||29.92;
+  const rwy = parseFloat(document.getElementById('rwyHeading').value)||0;
+  const windDir = parseFloat(document.getElementById('windDir').value)||0;
+  const windSpd = parseFloat(document.getElementById('windSpd').value)||0;
+
+  const basic = parseFloat(document.getElementById('basicWeight').value)||0;
+  const fuelGal = parseFloat(document.getElementById('fuelGal').value)||0;
+  const pax = parseFloat(document.getElementById('paxWeight').value)||0;
+  const luggage = parseFloat(document.getElementById('luggageWeight').value)||0;
+  const fuelLb = Math.round(fuelGal * FUEL_LB_PER_GAL);
+  const perfWeight = basic + fuelLb + pax + luggage;
 
   const out = document.getElementById('out');
-  if(isNaN(tempF)){ out.innerHTML = '<strong>Enter a valid temperature (°F).</strong>'; return; }
+  if(isNaN(tempF)){ out.innerHTML="Enter valid temperature"; return; }
 
-  const da = densityAltitude(elev, tempF, altim);
-  const wc = windComponents(rwy, windDir, windSpd);
-  const baseTO = interpTable(TAKEOFF_TABLE, da);
-  const baseLD = interpTable(LANDING_TABLE, da);
-  if(!baseTO || !baseLD){ out.innerHTML = `<strong>No table data available for DA=${da} ft. Paste digitized chart data into the script.</strong>`; return; }
+  const da = densityAltitude(elev,tempF,altim);
+  const wc = windComponents(rwy,windDir,windSpd);
+  const baseTO = interpTable(TAKEOFF_TABLE,da);
+  const baseLD = interpTable(LANDING_TABLE,da);
 
-  function applyWindCorrection(distance, headwind){
-    if(headwind >= 0){ const reduction = Math.min(headwind,20) * 0.015; return distance * (1 - reduction); }
-    else { const tw = Math.abs(headwind); const increase = Math.min(tw,10) * 0.03; return distance * (1 + increase); }
+  function applyWind(distance,head){
+    if(head>=0) return distance*(1 - Math.min(head,20)*0.015);
+    return distance*(1 + Math.min(Math.abs(head),10)*0.03);
   }
 
   const wFactor = weightCorrectionFactor(perfWeight);
-  const toGroundRoll = Math.round(applyWindCorrection(baseTO.groundRoll * wFactor, wc.headwind));
-  const to50 = Math.round(applyWindCorrection(baseTO.distance50 * wFactor, wc.headwind));
-  const ldGroundRoll = Math.round(applyWindCorrection(baseLD.groundRoll * wFactor, wc.headwind));
-  const ld50 = Math.round(applyWindCorrection(baseLD.distance50 * wFactor, wc.headwind));
-
-  const basic = parseFloat(document.getElementById('basicWeight').value) || 0;
-  const fuelGal = parseFloat(document.getElementById('fuelGal').value) || 0;
-  const pax = parseFloat(document.getElementById('paxWeight').value) || 0;
-  const luggage = parseFloat(document.getElementById('luggageWeight').value) || 0;
-  const fuelLb = Math.round(fuelGal * FUEL_LB_PER_GAL);
-  const totalTakeoffWeight = Math.round(basic + fuelLb + pax + luggage);
-
-  let weightWarningHtml = '';
-  if(totalTakeoffWeight > MTOW) weightWarningHtml = `<div class="warning"><strong>WARNING:</strong> Total weight ${totalTakeoffWeight} lb exceeds MTOW ${MTOW} lb.</div>`;
+  const toRoll = Math.round(applyWind(baseTO.groundRoll*wFactor, wc.headwind));
+  const to50 = Math.round(applyWind(baseTO.distance50*wFactor, wc.headwind));
+  const ldRoll = Math.round(applyWind(baseLD.groundRoll*wFactor, wc.headwind));
+  const ld50 = Math.round(applyWind(baseLD.distance50*wFactor, wc.headwind));
 
   out.innerHTML = `
     <strong>Density Altitude:</strong> ${da} ft<br>
-    <strong>Wind components:</strong> Headwind ${wc.headwind} kt; Crosswind ${wc.crosswind} kt<br><br>
+    <strong>Wind:</strong> Headwind ${wc.headwind} kt; Crosswind ${wc.crosswind} kt<br><br>
 
-    <strong>Takeoff (estimated)</strong><br>
-    Ground roll: <strong>${toGroundRoll} ft</strong><br>
-    Distance to 50 ft: <strong>${to50} ft</strong><br><br>
+    <strong>Takeoff</strong><br>
+    Ground roll: ${toRoll} ft<br>
+    50 ft: ${to50} ft<br><br>
 
-    <strong>Landing (estimated)</strong><br>
-    Ground roll: <strong>${ldGroundRoll} ft</strong><br>
-    Distance over 50 ft: <strong>${ld50} ft</strong><br><br>
+    <strong>Landing</strong><br>
+    Ground roll: ${ldRoll} ft<br>
+    50 ft: ${ld50} ft<br><br>
 
-    <strong>Performance weight used:</strong> ${perfWeight} lb<br>
-    <strong>Total takeoff weight (basic+fuel+pax+luggage):</strong> ${totalTakeoffWeight} lb<br>
-    ${weightWarningHtml}
-    <div class="muted" style="margin-top:8px"><small>Replace sample tables with official digitized Piper PA‑38‑112 values for accurate performance.</small></div>
+    <strong>Performance weight:</strong> ${perfWeight} lb
   `;
 });
 </script>
+
 </body>
 </html>
