@@ -38,26 +38,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Fetch METAR from NOAA Aviation Weather API
 async function fetchMetar(icao) {
-  const url = `https://aviationweather.gov/api/data/metar?ids=${icao}&format=json`;
+  const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?station=${icao}&data=metar&tz=UTC&format=json&latlon=no&year1=2024&month1=1&day1=1`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
 
-    if (!data || data.length === 0) {
+    if (!data || !data.data || data.data.length === 0) {
       return { error: "No METAR found for this airport." };
     }
 
-    const metar = data[0];
+    const metar = data.data[data.data.length - 1]; // latest report
 
     return {
-      raw: metar.rawOb,
-      temp: metar.temp,
-      dewpoint: metar.dewp,
-      altimeter: metar.altim,
-      windDir: metar.wdir,
-      windSpeed: metar.wspd,
-      time: metar.obsTime
+      raw: metar.metar,
+      temp: metar.tmpf ? ((metar.tmpf - 32) * 5) / 9 : null,
+      dewpoint: metar.dwpf ? ((metar.dwpf - 32) * 5) / 9 : null,
+      altimeter: metar.alti,
+      windDir: metar.drct,
+      windSpeed: metar.sknt,
+      time: metar.valid
     };
   } catch (err) {
     return { error: "Error fetching METAR." };
